@@ -22,13 +22,19 @@ An end-to-end batch data pipeline that extracts, cleans, and transforms daily cr
 - [Author](#author)
 
 ## Background & Goal
-This project simulates the data needs of an analyst/trading team (hypothetical stakeholder) that requires daily visibility into crypto market movements. The pipeline is built to answer three core business questions:
+Crypto prices move fast and around the clock, but manually tracking gainers/losers, volatility, and trend across dozens of coins by refreshing an exchange page or eyeballing a chart doesn't scale and isn't repeatable day to day. An analyst or trading team (this project's hypothetical stakeholder) needs a structured, daily source of truth on market movement instead of an ad-hoc check.
 
-1. **Which coins moved significantly** (up or down) today? (top gainers/losers)
-2. **Which coins are highly volatile** over a given period? (risk indicator)
-3. **What is the short-to-medium term price trend** for a given coin? (moving average)
+This project builds a batch pipeline that ingests daily market data from the CoinGecko API and transforms it into three decision-ready metrics, answering:
+1. **Which coins moved significantly** today (up or down)? → top gainers/losers.
+2. **Which coins are highly volatile** over a given period? → a risk indicator.
+3. **What is the short-to-medium term price trend** for a given coin? → a 7-day moving average.
 
-**Scope**: the top 15 coins by market cap. This is a deliberate design decision — sufficient to demonstrate pipeline depth (data quality, incremental loading, transformation logic) without the unnecessary complexity of large-scale data for a portfolio project.
+Scope: the top 15 coins by market cap. This is a deliberate design decision — sufficient to demonstrate pipeline depth (data quality, incremental loading, transformation logic) without the unnecessary complexity of large-scale data for a portfolio project.
+
+**Success metrics:**
+- **Freshness**, the daily snapshot lands and is queryable in Gold before the next @daily run starts.
+- **Data quality SLA**, 100% of Bronze and Gold rows pass Great Expectations and dbt test checks (no negative prices/volatility).
+- **Idempotency**, re-running any DAG for a given date does not create duplicate or inconsistent rows.
 
 ## Architecture
 
