@@ -29,7 +29,7 @@ This project builds a batch pipeline that ingests daily market data from the Coi
 2. **Which coins are highly volatile** over a given period? → a risk indicator.
 3. **What is the short-to-medium term price trend** for a given coin? → a 7-day moving average.
 
-Scope: the top 15 coins by market cap. This is a deliberate design decision — sufficient to demonstrate pipeline depth (data quality, incremental loading, transformation logic) without the unnecessary complexity of large-scale data for a portfolio project.
+**Scope**: the top 15 coins by market cap. This is a deliberate design decision and sufficient to demonstrate pipeline depth (data quality, incremental loading, transformation logic) without the unnecessary complexity of large-scale data for a portfolio project.
 
 **Success metrics:**
 - **Freshness**, the daily snapshot lands and is queryable in Gold before the next @daily run starts.
@@ -169,16 +169,14 @@ The "Crypto Market Monitoring Dashboard" in Metabase includes:
 
 - **ELT, not ETL**: transformation happens inside the warehouse (Postgres) via dbt, leveraging the database's own compute power instead of processing data externally.
 - **Idempotency**: the Bronze layer uses `UPSERT`; the Gold layer is materialized as a `table` (full refresh on every run), making re-runs safe without duplicating data.
-- **Backfill separated from incremental daily load**: the `/coins/{id}/market_chart` endpoint is used for a one-time 30-day historical backfill, while `/coins/markets` is used for the recurring daily snapshot — ensuring moving average and volatility metrics have representative data from day one.
-- **Secrets management**: credentials are accessed via Airflow Connections/Variables or environment variables, never hardcoded and never read via `python-dotenv` inside DAG code (to avoid unnecessary I/O overhead on every scheduler parse cycle).
 - **DAG dependency**: `dag_transform_dbt` waits for `dag_daily_pipeline` to complete via an `ExternalTaskSensor`, ensuring consistent ordering on every scheduled run.
 - **Retry & alerting**: every task has automatic retries (2x, 5-minute delay) and logs a clear alert once retries are exhausted.
 
 ## Limitations & Future Work
 
+- Chose daily batch processing even though crypto prices change constantly. This works fine for the portfolio's decision-ready metrics, but not built for live trading use cases.
+- Chose PostgreSQL, a traditional relational database, over a cloud-native data warehouse. It's less scalable and slower for large-scale analytical queries, but simpler to set up and run.
 - Current scope: 15 coins (extendable via `COIN_IDS` in `config.py`)
-- Development environment: local Docker Compose (the scheduler must be running for automated runs to trigger)
-- Stretch goals: migrate the Gold layer to BigQuery, deploy to a cloud VM for 24/7 scheduling, add lightweight CI/CD for `dbt test`
 
 ## Author
 
