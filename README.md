@@ -18,7 +18,7 @@ An end-to-end batch data pipeline that extracts, cleans, and transforms daily cr
 - [How to Run](#how-to-run)
 - [Dashboard](#dashboard)
 - [Key Design Decisions](#key-design-decisions)
-- [Limitations & Future Work](#limitations--future-work)
+- [Design Trade-Offs & Limitations](#design-trade-offs--limitations)
 - [Author](#author)
 
 ## Background & Goal
@@ -172,7 +172,7 @@ The "Crypto Market Monitoring Dashboard" in Metabase includes:
 - **DAG dependency**: `dag_transform_dbt` waits for `dag_daily_pipeline` to complete via an `ExternalTaskSensor`, ensuring consistent ordering on every scheduled run.
 - **Retry & alerting**: every task has automatic retries (2x, 5-minute delay) and logs a clear alert once retries are exhausted.
 
-## Limitations & Future Work
+## Design Trade-Offs & Limitations
 
 - Chose daily batch processing even though crypto prices change constantly. This works fine for the portfolio's decision-ready metrics, but not built for live trading use cases.
 - Chose PostgreSQL, a traditional relational database, over a cloud-native data warehouse. It's less scalable and slower for large-scale analytical queries, but simpler to set up and run.
