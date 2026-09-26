@@ -1,14 +1,5 @@
 """
-> DAG Backfill Historical Data < 
-Notes:
-Backfill data historis ~30 hari per coin ke MinIO, 
-menggunakan endpoint /coins/{id}/market_chart. 
-Dengan tujuan supaya metric moving average 7 hari dan volatility 30 hari
-punya data historis representatif sejak awal pipeline berjalan.
-
-How to use: 
-trigger MANUAL sekali dari Airflow UI, cukup 1x saja.
-Jangan schedule DAG ini.
+DAG Backfill Historical Data 
 """
 
 import json
